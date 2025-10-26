@@ -1,4 +1,5 @@
 import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-verify";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -20,6 +21,21 @@ const config: HardhatUserConfig = {
       chainId: 84532,
       accounts: PRIVATE_KEY ? [PRIVATE_KEY] : []
     }
+  },
+  etherscan: {
+    apiKey: {
+      "base-sepolia": process.env.BASESCAN_API_KEY || ""
+    },
+    customChains: [
+      {
+        network: "base-sepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org"
+        }
+      }
+    ]
   }
 };
 

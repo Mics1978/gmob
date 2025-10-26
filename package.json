@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/Mics1978/gmob#readme",
   "devDependencies": {
+    "@nomicfoundation/hardhat-verify": "^3.0.4",
     "@types/node": "^24.9.1",
     "dotenv": "^17.2.3",
     "hardhat": "^3.0.9",
