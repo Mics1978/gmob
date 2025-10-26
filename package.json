@@ -1,0 +1,35 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "for use with cursor",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "hardhat compile",
+    "deploy:base-sepolia": "hardhat run scripts/deploy.ts --network base-sepolia"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mics1978/gmob.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mics1978/gmob/issues"
+  },
+  "homepage": "https://github.com/Mics1978/gmob#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-verify": "^3.0.4",
+    "@types/node": "^24.9.1",
+    "dotenv": "^17.2.3",
+    "hardhat": "^3.0.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0",
+    "ethers": "^6.15.0"
+  }
+}
