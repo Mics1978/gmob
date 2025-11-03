@@ -2,7 +2,7 @@ require("dotenv").config();
 require("@nomicfoundation/hardhat-toolbox");
 require("hardhat-gas-reporter");
 
-const { DEPLOYER_PRIVATE_KEY, BASE_RPC_URL, BASE_SEPOLIA_RPC_URL, COINMARKETCAP_API_KEY } = process.env;
+const { PRIVATE_KEY, BASE_RPC_URL, BASE_SEPOLIA_RPC_URL, COINMARKETCAP_API_KEY } = process.env;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -18,12 +18,12 @@ module.exports = {
   networks: {
     base: {
       url: BASE_RPC_URL || "https://mainnet.base.org",
-      accounts: DEPLOYER_PRIVATE_KEY ? [DEPLOYER_PRIVATE_KEY] : [],
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
       chainId: 8453,
     },
     baseSepolia: {
       url: BASE_SEPOLIA_RPC_URL || "https://sepolia.base.org",
-      accounts: DEPLOYER_PRIVATE_KEY ? [DEPLOYER_PRIVATE_KEY] : [],
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
       chainId: 84532,
     },
   },
