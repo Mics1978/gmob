@@ -6,6 +6,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+
+// Optional royalties (commented for future enablement)
+// import "@openzeppelin/contracts/token/common/ERC2981.sol";
+// contract GMOBPaidNFT is ERC721, Ownable, ReentrancyGuard, ERC2981 { ... }
+// function setDefaultRoyalty(address receiver, uint96 feeNumerator) external onlyOwner { _setDefaultRoyalty(receiver, feeNumerator); }
+// function deleteDefaultRoyalty() external onlyOwner { _deleteDefaultRoyalty(); }
 
 /**
  * @title GMOBPaidNFT
@@ -13,6 +20,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  */
 contract GMOBPaidNFT is ERC721, Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
+    using Strings for uint256;
 
     IERC20 public gmobToken;
     uint256 public mintPrice;
@@ -24,54 +32,46 @@ contract GMOBPaidNFT is ERC721, Ownable, ReentrancyGuard {
     event NFTMinted(address indexed payer, address indexed to, uint256 indexed tokenId, uint256 price);
     event BaseURIUpdated(string newBaseURI);
     event PublicMint(address indexed payer, uint256 indexed tokenId, uint256 pricePaid);
+    event GMOBWithdrawn(address indexed to, uint256 amount);
 
+    /// @notice Initializes the GMOB-paid NFT collection and sets the GMOB token address.
     constructor() ERC721("GMOB Paid NFT", "GMOBNFT") Ownable(msg.sender) {
         gmobToken = IERC20(0x12B45ABb5D8C5f7a55E04fDa17beD9ef71a9C519);
         _nextTokenId = 1;
     }
 
-    /**
-     * @notice Sets the GMOB token address used for payments.
-     * @param newToken The new ERC-20 token address.
-     */
+    /// @notice Sets the GMOB token address used for payments.
+    /// @param newToken The new ERC-20 token address.
     function setGMOBToken(address newToken) external onlyOwner {
         require(newToken != address(0), "GMOBPaidNFT: invalid token address");
         gmobToken = IERC20(newToken);
         emit GMOBTokenUpdated(newToken);
     }
 
-    /**
-     * @notice Updates the mint price denominated in GMOB tokens.
-     * @param newPrice The new mint price.
-     */
+    /// @notice Updates the mint price denominated in GMOB tokens.
+    /// @param newPrice The new mint price per NFT in GMOB token units.
     function setMintPrice(uint256 newPrice) external onlyOwner {
         mintPrice = newPrice;
         emit MintPriceUpdated(newPrice);
     }
 
-    /**
-     * @notice Updates the base token URI used by tokenURI.
-     * @param newBaseURI The new base URI string.
-     */
+    /// @notice Updates the base token URI used to construct token metadata URLs.
+    /// @param newBaseURI The new base URI string, expected to end with a trailing slash.
     function setBaseURI(string memory newBaseURI) external onlyOwner {
         _baseTokenURI = newBaseURI;
         emit BaseURIUpdated(newBaseURI);
     }
 
-    /**
-     * @notice Returns the next token ID that will be minted.
-     */
+    /// @notice Returns the next token ID scheduled to be minted.
     function getNextTokenId() external view returns (uint256) {
         return _nextTokenId;
     }
 
-    /**
-     * @notice Mints an NFT to `to`, pulling GMOB tokens from `payer` as payment.
-     * @dev Only callable by the contract owner. Requires allowance from `payer`.
-     * @param to The address receiving the NFT.
-     * @param payer The address providing GMOB tokens for payment.
-     * @return tokenId The ID of the newly minted token.
-     */
+    /// @notice Owner-controlled mint that charges a GMOB payment from the designated payer.
+    /// @dev Requires the payer to have approved this contract and cannot be re-entered.
+    /// @param to Recipient address receiving the minted NFT.
+    /// @param payer Address providing the GMOB payment.
+    /// @return tokenId The identifier of the newly minted NFT.
     function mint(address to, address payer) external onlyOwner nonReentrant returns (uint256 tokenId) {
         require(to != address(0), "GMOBPaidNFT: invalid recipient");
         require(payer != address(0), "GMOBPaidNFT: invalid payer");
@@ -90,11 +90,9 @@ contract GMOBPaidNFT is ERC721, Ownable, ReentrancyGuard {
         emit NFTMinted(payer, to, tokenId, price);
     }
 
-    /**
-     * @notice Allows the public to mint an NFT by paying the mint price in GMOB tokens.
-     * @dev Requires the sender to approve this contract for `mintPrice` GMOB tokens prior to calling.
-     * @return tokenId The ID of the newly minted token.
-     */
+    /// @notice Public minting flow that charges `mintPrice` GMOB tokens from the caller.
+    /// @dev Caller must approve this contract to spend at least `mintPrice` GMOB tokens.
+    /// @return tokenId The identifier of the newly minted NFT.
     function publicMint() external nonReentrant returns (uint256 tokenId) {
         uint256 price = mintPrice;
         require(price > 0, "GMOBPaidNFT: mint price not set");
@@ -110,20 +108,20 @@ contract GMOBPaidNFT is ERC721, Ownable, ReentrancyGuard {
         emit PublicMint(msg.sender, tokenId, price);
     }
 
-    /**
-     * @notice Withdraws GMOB tokens held by the contract to a specified address.
-     * @param to The address receiving the withdrawn tokens.
-     */
-    function withdrawGMOB(address to) external onlyOwner {
+    /// @notice Withdraws the entire GMOB balance held by the contract to the specified address.
+    /// @param to Recipient of the withdrawn GMOB tokens.
+    function withdrawGMOB(address to) external onlyOwner nonReentrant {
         require(to != address(0), "GMOBPaidNFT: invalid recipient");
         uint256 balance = gmobToken.balanceOf(address(this));
         gmobToken.safeTransfer(to, balance);
+        emit GMOBWithdrawn(to, balance);
     }
 
-    /**
-     * @dev Returns the base URI for computing {tokenURI}. Empty by default.
-     */
-    function _baseURI() internal view override returns (string memory) {
-        return _baseTokenURI;
+    /// @inheritdoc ERC721
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        _requireOwned(tokenId);
+
+        string memory baseURI = _baseTokenURI;
+        return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString())) : "";
     }
 }
