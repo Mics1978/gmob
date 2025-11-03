@@ -1,0 +1,31 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "for use with cursor",
+  "main": "index.js",
+  "scripts": {
+    "compile": "REPORT_GAS=true npx hardhat compile",
+    "deploy:base": "npx hardhat run scripts/deploy.js --network base",
+    "deploy:base-sepolia": "npx hardhat run scripts/deploy.js --network baseSepolia"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mics1978/gmob.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mics1978/gmob/issues"
+  },
+  "homepage": "https://github.com/Mics1978/gmob#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "dotenv": "^17.2.3",
+    "hardhat": "^2.26.5",
+    "hardhat-gas-reporter": "^2.3.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0"
+  }
+}
