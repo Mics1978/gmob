@@ -1,0 +1,39 @@
+{
+  "programme": {
+    "name": "ZIMZ Auto",
+    "tagline": "No Stress. Stay Active.",
+    "weekly_reward_green": 6,
+    "weekly_service_fee_green": 2,
+    "default_timezone": "Europe/London"
+  },
+  "profiles": [
+    {
+      "name": "Ori",
+      "handle": "fam_rex_placeholder",
+      "role": "GMoB ambassador",
+      "wallet_ref": "ADD_WALLET_REFERENCE",
+      "consent": false,
+      "connection_status": "pending",
+      "status": "pending",
+      "tone": ["relaxed", "positive", "lifestyle"],
+      "approved_topics": ["GMoB services", "SZIMZ ecosystem", "GREEN AIPE service-credit use cases", "artist releases"],
+      "blocked_topics": ["politics", "guaranteed income", "investment claims"],
+      "posting_window": "18:00-21:00",
+      "timezone": "Europe/London"
+    },
+    {
+      "name": "Lil Z",
+      "handle": "ADD_HANDLE",
+      "role": "GMoB Africa ambassador",
+      "wallet_ref": "ADD_WALLET_REFERENCE",
+      "consent": false,
+      "connection_status": "pending",
+      "status": "pending",
+      "tone": ["direct", "energetic", "music-first"],
+      "approved_topics": ["GMoB Africa", "SZIMZ ecosystem", "GREEN AIPE service-credit use cases", "artist releases"],
+      "blocked_topics": ["politics", "guaranteed income", "investment claims"],
+      "posting_window": "18:00-21:00",
+      "timezone": "Europe/London"
+    }
+  ]
+}
